@@ -764,6 +764,8 @@ arr.sort(function (x, y) {
     }
     return 0;
 }); // [20, 10, 2, 1]
+
+arr.sort((x, y) => x - y); // [1, 2, 10, 20]
 ```
 
 #### 闭包
@@ -781,7 +783,27 @@ function lazy_sum(arr) {
 var f = lazy_sum([1, 2, 3, 4, 5]); // function sum()
 
 f(); // 15
+
+
+'use strict';
+
+function make_pow(n) {
+    return function (x) {
+        return Math.pow(x, n);
+    }
+}
+
+// 创建两个新函数:
+var pow2 = make_pow(2);
+var pow3 = make_pow(3);
+
+console.log(pow2(5)); // 25
+console.log(pow3(7)); // 343
+
 ```
+
+#### generator（生成器）
+
 
 ## JavaScript进阶
 

@@ -147,6 +147,33 @@ function isprime(x) {
 }}
 ```
 
+### 创建一个计数器
+
+```javascript
+'use strict';
+
+function create_counter(initial) {
+    var x = initial || 0;
+    return {
+        inc: function () {
+            x += 1;
+            return x;
+        }
+    }
+}
+
+var c1 = create_counter();
+c1.inc(); // 1
+c1.inc(); // 2
+c1.inc(); // 3
+
+var c2 = create_counter(10);
+c2.inc(); // 11
+c2.inc(); // 12
+c2.inc(); // 13
+
+```
+
 ### 案例 验证Email地址的正则表达式
 
 ```javascript
