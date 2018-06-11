@@ -47,6 +47,106 @@ while (i < arr.length) {
 }
 ```
 
+### sum函数
+
+编写一个sum()函数，接收任意个参数并返回它们的和
+
+```javascript
+'use strict';
+
+function sum(...rest) {
+    let x = 0;
+    for (let i of rest) {
+        x += i;
+    }
+    return x;
+}
+
+function sum(...rest) {
+    let x = 0;
+    rest.forEach(function (element) {
+        x += element;
+});
+    return x;
+}
+
+
+// 测试:
+var i, args = [];
+for (i=1; i<=100; i++) {
+    args.push(i);
+}
+if (sum() !== 0) {
+    console.log('测试失败: sum() = ' + sum());
+} else if (sum(1) !== 1) {
+    console.log('测试失败: sum(1) = ' + sum(1));
+} else if (sum(2, 3) !== 5) {
+    console.log('测试失败: sum(2, 3) = ' + sum(2, 3));
+} else if (sum.apply(null, args) !== 5050) {
+    console.log('测试失败: sum(1, 2, 3, ..., 100) = ' + sum.apply(null, args));
+} else {
+    console.log('测试通过!');
+}
+```
+
+### 利用map和reduce操作实现一个string2int()函数
+```javascript
+'use strict';
+
+function string2int(s) {
+    return s.split('').map(x=>+x).reduce((x,y)=>10*x+y);
+}
+
+// 测试:
+if (string2int('0') === 0 && string2int('12345') === 12345 && string2int('12300') === 12300) {
+    if (string2int.toString().indexOf('parseInt') !== -1) {
+        console.log('请勿使用parseInt()!');
+    } else if (string2int.toString().indexOf('Number') !== -1) {
+        console.log('请勿使用Number()!');
+    } else {
+        console.log('测试通过!');
+    }
+}
+else {
+    console.log('测试失败!');
+}
+```
+### 去除Array的重复元素
+
+```javascript
+'use strict';
+
+var
+    r,
+    arr = ['apple', 'strawberry', 'banana', 'pear', 'apple', 'orange', 'orange', 'strawberry'];
+r = arr.filter(function (element, index, self) {
+    return self.indexOf(element) === index;
+});
+
+console.log(r.toString());
+```
+
+### 筛选素数
+
+```javascript
+function get_primes(arr) {
+    return arr.filter(isprime);
+}
+
+function isprime(x) {
+    if (x == 1) {
+        return false;
+    } else {
+    let i;
+    for (i = 2; i < x; i++) {
+        if (x % i == 0) {
+            return false;
+        }
+    }
+    return true;
+}}
+```
+
 ### 案例 验证Email地址的正则表达式
 
 ```javascript

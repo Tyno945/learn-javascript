@@ -26,8 +26,13 @@ JavaScript是一种运行在浏览器中的解释型的编程语言。
 
 变量在JavaScript中就是用一个变量名表示，变量名是大小写英文、数字、$和_的组合，且不能用数字开头。
 
-变量用`let`申明。
+变量用`let`申明。具有块级作用域。
 
+#### 常量
+
+```javascript
+const PI = 3.14;
+```
 ### 数据类型
 
 * 数值
@@ -407,12 +412,381 @@ console.log(sum);
 
 ### Map和Set
 
+Map是一组键值对的结构，具有极快的查找速度。初始化Map需要一个二维数组，或者直接初始化一个空Map。
+
+Set和Map类似，也是一组key的集合，但不存储value。由于key不能重复，所以，在Set中，没有重复的key。
+
+要创建一个Set，需要提供一个Array作为输入，或者直接创建一个空Set。
+
+```javascript
+var m = new Map([['Michael', 95], ['Bob', 75], ['Tracy', 85]]);
+m.get('Michael'); // 95
+
+var m = new Map(); // 空Map
+m.set('Adam', 67); // 添加新的key-value
+m.set('Bob', 59);
+m.has('Adam'); // 是否存在key 'Adam': true
+m.get('Adam'); // 67
+m.delete('Adam'); // 删除key 'Adam'
+m.get('Adam'); // undefined
+
+var s1 = new Set(); // 空Set
+var s = new Set([1, 2, 3]); // 含1, 2, 3
+s.add(4);
+s; // Set {1, 2, 3, 4}
+s.add(4);
+s; // 仍然是 Set {1, 2, 3, 4}
+s.delete(3);
+s; // Set {1, 2, 4}
+```
+
 ### iterable
 
+为了统一集合类型，ES6标准引入了新的iterable类型，Array、Map和Set都属于iterable类型。
+
+具有iterable类型的集合可以通过新的for ... of循环来遍历。
+
+更好的方式是直接使用iterable内置的forEach方法，它接收一个函数，每次迭代就自动回调该函数。
+
+```javascript
+var a = ['A', 'B', 'C'];
+var s = new Set(['A', 'B', 'C']);
+var m = new Map([[1, 'x'], [2, 'y'], [3, 'z']]);
+for (var x of a) { // 遍历Array
+    console.log(x);
+}
+for (var x of s) { // 遍历Set
+    console.log(x);
+}
+for (var x of m) { // 遍历Map
+    console.log(x[0] + '=' + x[1]);
+}
+
+
+'use strict';
+var a = ['A', 'B', 'C'];
+
+a.forEach(function (element, index, array) {
+    // element: 指向当前元素的值
+    // index: 指向当前索引
+    // array: 指向Array对象本身
+    console.log(element + ', index = ' + index);
+});
+
+var s = new Set(['A', 'B', 'C']);
+s.forEach(function (element, sameElement, set) {
+    console.log(element);
+});
+
+var m = new Map([[1, 'x'], [2, 'y'], [3, 'z']]);
+m.forEach(function (value, key, map) {
+    console.log(value);
+});
+```
+
 ### 函数
+
+借助抽象，我们才能不关心底层的具体计算过程，而直接在更高的层次上思考问题。
+
+写计算机程序也是一样，函数就是最基本的一种代码抽象的方式。
+
+#### 函数定义与调用
+
+函数定义
+
+```javascript
+// 函数定义1
+function abs(x) {
+    if (x >= 0) {
+        return x;
+    } else {
+        return -x;
+    }
+}
+// 函数定义2 匿名函数
+var abs = function (x) {
+    if (x >= 0) {
+        return x;
+    } else {
+        return -x;
+    }
+};
+
+// 函数定义3 箭头函数
+x => x * x
+
+// 相当于
+function (x) {
+    return x * x;
+}
+
+// 可变参数:
+(x, y, ...rest) => {
+    var i, sum = x + y;
+    for (i=0; i<rest.length; i++) {
+        sum += rest[i];
+    }
+    return sum;
+}
+```
+
+函数调用
+
+```javascript
+abs(); // 返回NaN
+
+// 参数检查
+function abs(x) {
+    if (typeof x !== 'number') {
+        throw 'Not a number';
+    }
+    if (x >= 0) {
+        return x;
+    } else {
+        return -x;
+    }
+}
+```
+
+arguments关键字
+
+只在函数内部起作用，并且永远指向当前函数的调用者传入的所有参数。arguments类似Array但它不是一个Array.
+
+```javascript
+function foo(x) {
+    console.log('x = ' + x); // 10
+    for (var i=0; i<arguments.length; i++) {
+        console.log('arg ' + i + ' = ' + arguments[i]); // 10, 20, 30
+    }
+}
+foo(10, 20, 30);
+
+/*
+x = 10
+arg 0 = 10
+arg 1 = 20
+arg 2 = 30
+*/
+
+function abs() {
+    if (arguments.length === 0) {
+        return 0;
+    }
+    var x = arguments[0];
+    return x >= 0 ? x : -x;
+}
+
+abs(); // 0
+abs(10); // 10
+abs(-9); // 9
+```
+
+rest参数
+
+```javascript
+function foo(a, b, ...rest) {
+    console.log('a = ' + a);
+    console.log('b = ' + b);
+    console.log(rest);
+}
+
+foo(1, 2, 3, 4, 5);
+// 结果:
+// a = 1
+// b = 2
+// Array [ 3, 4, 5 ]
+
+foo(1);
+// 结果:
+// a = 1
+// b = undefined
+// Array []
+```
+
+#### 变量作用域与解构赋值
+
+JavaScript的函数在查找变量时从自身函数定义开始，从“内”向“外”查找。如果内部函数定义了与外部函数重名的变量，则内部函数的变量将“屏蔽”外部函数的变量。
+
+我们在函数内部定义变量时，请严格遵守“在函数内部首先申明所有变量”这一规则。
+
+JavaScript实际上只有一个全局作用域。任何变量（函数也视为变量），如果没有在当前函数作用域中找到，就会继续往上查找，最后如果在全局作用域中也没有找到，则报ReferenceError错误。
+
+JavaScript默认有一个全局对象window，全局作用域的变量实际上被绑定到window的一个属性
+
+
+```javascript
+// 解构赋值
+let [x, [y, z]] = ['hello', ['JavaScript', 'ES6']];
+x; // 'hello'
+y; // 'JavaScript'
+z; // 'ES6'
+
+var person = {
+    name: '小明',
+    age: 20,
+    gender: 'male',
+    passport: 'G-12345678',
+    school: 'No.4 middle school',
+    address: {
+        city: 'Beijing',
+        street: 'No.1 Road',
+        zipcode: '100001'
+    }
+};
+var {name, address: {city, zip}} = person;
+name; // '小明'
+city; // 'Beijing'
+zip; // undefined, 因为属性名是zipcode而不是zip
+
+// 交换两个变量x和y的值
+var x=1, y=2;
+[x, y] = [y, x];
+
+// 快速获取当前页面的域名和路径
+var {hostname:domain, pathname:path} = location;
+```
+#### 函数apply方法
+
+要指定函数的this指向哪个对象，可以用函数本身的apply方法，它接收两个参数，第一个参数就是需要绑定的this变量，第二个参数是Array，表示函数本身的参数。
+
+```javascript
+function getAge() {
+    var y = new Date().getFullYear();
+    return y - this.birth;
+}
+
+var xiaoming = {
+    name: '小明',
+    birth: 1990,
+    age: getAge
+};
+
+xiaoming.age(); // 25
+getAge.apply(xiaoming, []); // 25, this指向xiaoming, 参数为空
+```
+
+#### 装饰器
+
+```javascript
+'use strict';
+
+var count = 0;
+var oldParseInt = parseInt; // 保存原函数
+
+window.parseInt = function () {
+    count += 1;
+    return oldParseInt.apply(null, arguments); // 调用原函数
+};
+// 测试:
+parseInt('10');
+parseInt('20');
+parseInt('30');
+console.log('count = ' + count); // 3
+
+```
+
+#### 高阶函数
+
+一个函数就可以接收另一个函数作为参数，这种函数就称之为高阶函数。
+
+```javascript
+'use strict';
+
+function add(x, y, f) {
+    return f(x) + f(y);
+}
+var x = add(-5, 6, Math.abs); // 11
+console.log(x);
+
+```
+
+1. map/reduce
+
+map()方法定义在JavaScript的Array中，我们调用Array的map()方法，传入我们自己的函数，就得到了一个新的Array作为结果
+
+```javascript
+'use strict';
+
+function pow(x) {
+    return x * x;
+}
+
+var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+var results = arr.map(pow); // [1, 4, 9, 16, 25, 36, 49, 64, 81]
+console.log(results);
+
+var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+arr.map(String); // ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+```
+Array的reduce()把一个函数作用在这个Array的[x1, x2, x3...]上，这个函数必须接收两个参数，reduce()把结果继续和序列的下一个元素做累积计算。
+
+```javascript
+[x1, x2, x3, x4].reduce(f) = f(f(f(x1, x2), x3), x4)
+
+var arr = [1, 3, 5, 7, 9];
+arr.reduce(function (x, y) {
+    return x + y;
+}); // 25
+```
+
+2. filter
+
+filter()把传入的函数依次作用于每个元素，然后根据返回值是true还是false决定保留还是丢弃该元素。
+
+```javascript
+// 筛选出奇数
+
+var arr = [1, 2, 4, 5, 6, 9, 10, 15];
+var r = arr.filter(function (x) {
+    return x % 2 !== 0;
+});
+r; // [1, 5, 9, 15]
+
+// 把一个Array中的空字符串删掉
+var arr = ['A', '', 'B', null, undefined, 'C', '  '];
+var r = arr.filter(function (s) {
+    return s && s.trim(); // 注意：IE9以下的版本没有trim()方法
+});
+r; // ['A', 'B', 'C']
+```
+3. sort
+
+sort()方法会直接对Array进行修改，它返回的结果仍是当前Array
+
+```javascript
+var arr = [10, 20, 1, 2];
+arr.sort(function (x, y) {
+    if (x < y) {
+        return 1;
+    }
+    if (x > y) {
+        return -1;
+    }
+    return 0;
+}); // [20, 10, 2, 1]
+```
+
+#### 闭包
+
+```javascript
+function lazy_sum(arr) {
+    var sum = function () {
+        return arr.reduce(function (x, y) {
+            return x + y;
+        });
+    }
+    return sum;
+}
+
+var f = lazy_sum([1, 2, 3, 4, 5]); // function sum()
+
+f(); // 15
+```
 
 ## JavaScript进阶
 
 ## 难点及疑问
+
+1. 理解排序算法，sort方法
 
 ## 参考资料
