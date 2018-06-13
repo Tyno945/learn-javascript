@@ -174,6 +174,63 @@ c2.inc(); // 13
 
 ```
 
+### 产生斐波那契数列的函数
+
+```javascript
+function fib(max) {
+    var
+        t,
+        a = 0,
+        b = 1,
+        arr = [0, 1];
+    while (arr.length < max) {
+        [a, b] = [b, a + b];
+        arr.push(b);
+    }
+    return arr;
+}
+
+// 测试:
+fib(5); // [0, 1, 1, 2, 3]
+fib(10); // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+```
+
+### 用generator写一个自增ID
+
+```javascript
+// 1、用while条件判断
+function* next_id() {
+    var i = 1;
+    while (true) {
+        yield i;
+        i++;
+    }
+}
+
+// 2、用`for`循环
+function* next_id() {
+    for (let i=1; true; i++) {
+        yield i;
+    }
+}
+
+// 测试:
+var
+    x,
+    pass = true,
+    g = next_id();
+for (x = 1; x < 100; x ++) {
+    if (g.next().value !== x) {
+        pass = false;
+        console.log('测试失败!');
+        break;
+    }
+}
+if (pass) {
+    console.log('测试通过!');
+}
+```
+
 ### 案例 验证Email地址的正则表达式
 
 ```javascript
