@@ -963,6 +963,74 @@ class PrimaryStudent extends Student {
 }
 ```
 
+### 浏览器
+
+#### 浏览器对象
+
+* window
+* navigator
+* screen
+* location
+* document
+* history
+
+#### 操作DOM
+
+在操作一个DOM节点前，我们需要通过各种方式先拿到这个DOM节点。最常用的方法是`document.getElementById()`和`document.getElementsByTagName()`，以及CSS选择器`document.getElementsByClassName()`。
+
+第二种方法是使用`querySelector()`和`querySelectorAll()`，需要了解selector语法，然后使用条件来获取节点，更加方便
+
+```javascript
+// 通过querySelector获取ID为q1的节点：
+var q1 = document.querySelector('#q1');
+
+// 通过querySelectorAll获取q1节点内的符合条件的所有节点：
+var ps = q1.querySelectorAll('div.highlighted > p');
+```
+
+更新DOM
+
+可以直接修改节点的文本，方法有两种：一种是修改`innerHTML`属性，第二种是修改`innerText`或`textContent`属性，这样可以自动对字符串进行HTML编码，保证无法设置任何HTML标签.
+
+```javascript
+// 获取<p id="p-id">...</p>
+var p = document.getElementById('p-id');
+// 设置文本:
+p.innerText = '<script>alert("Hi")</script>';
+// HTML被自动编码，无法设置一个<script>节点:
+// <p id="p-id">&lt;script&gt;alert("Hi")&lt;/script&gt;</p>
+
+// 获取<p id="p-id">...</p>
+var p = document.getElementById('p-id');
+// 设置CSS:
+p.style.color = '#ff0000';
+p.style.fontSize = '20px';
+p.style.paddingTop = '2em';
+```
+
+插入DOM
+
+使用`appendChild`,`insertBefore`
+```javascript
+var
+    list = document.getElementById('list'),
+    haskell = document.createElement('p');
+haskell.id = 'haskell';
+haskell.innerText = 'Haskell';
+list.appendChild(haskell);
+```
+
+删除DOM
+
+```javascript
+// 拿到待删除节点:
+var self = document.getElementById('to-be-removed');
+// 拿到父节点:
+var parent = self.parentElement;
+// 删除:
+var removed = parent.removeChild(self);
+removed === self; // true
+```
 ## 难点及疑问
 
 1. 理解排序算法，sort方法
