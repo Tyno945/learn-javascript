@@ -1031,6 +1031,73 @@ var parent = self.parentElement;
 var removed = parent.removeChild(self);
 removed === self; // true
 ```
+
+#### 操作表单
+
+HTML表单的输入控件主要有以下几种：
+
+* 文本框，对应的`<input type="text">`，用于输入文本；
+
+* 口令框，对应的`<input type="password">`，用于输入口令；
+
+* 单选框，对应的`<input type="radio">`，用于选择一项；
+
+* 复选框，对应的`<input type="checkbox">`，用于选择多项；
+
+* 下拉框，对应的`<select>`，用于选择一项；
+
+* 隐藏文本，对应的`<input type="hidden">`，用户不可见，但表单提交时会把隐藏文本发送到服务器。
+
+```html
+<!-- HTML -->
+<form id="login-form" method="post" onsubmit="return checkForm()">
+    <input type="text" id="username" name="username">
+    <input type="password" id="input-password">
+    <input type="hidden" id="md5-password" name="password">
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+function checkForm() {
+    var input_pwd = document.getElementById('input-password');
+    var md5_pwd = document.getElementById('md5-password');
+    // 把用户输入的明文变为MD5:
+    md5_pwd.value = toMD5(input_pwd.value);
+    // 继续下一步:
+    return true;
+}
+</script>
+```
+
+#### 操作文件
+
+### Node.js
+
+对于高性能，异步IO、事件驱动是基本原则.因为JavaScript是单线程执行，根本不能进行同步IO操作，所以，JavaScript的这一“缺陷”导致了它只能使用异步IO。
+
+在Node上运行的JavaScript相比其他后端开发语言有何优势？
+
+最大的优势是借助JavaScript天生的事件驱动机制加V8高性能引擎，使编写高性能Web服务轻而易举。
+
+#### 安装Node.js和npm
+
+第一个Node程序
+
+```javascript
+C:\Workspace>node hello.js
+Hello, world.
+
+
+node --use_strict calc.js
+```
+
+搭建Node开发环境
+
+[运行和调试JavaScript](https://www.bilibili.com/video/av5827351/)
+
+#### 模块
+
+
 ## 难点及疑问
 
 1. 理解排序算法，sort方法

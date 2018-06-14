@@ -296,3 +296,72 @@ $.getJSON(url, function (data) {
 
 ```
 
+### 提交表单检测
+
+利用JavaScript检查用户注册信息是否正确，在以下情况不满足时报错并阻止提交表单：
+
+用户名必须是3-10位英文字母或数字；
+
+口令必须是6-20位；
+
+两次输入口令必须一致。
+
+```html
+<!-- HTML结构 -->
+<form id="test-register" action="#" target="_blank" onsubmit="return checkRegisterForm()">
+    <p id="test-error" style="color:red"></p>
+    <p>
+        用户名: <input type="text" id="username" name="username">
+    </p>
+    <p>
+        口令: <input type="password" id="password" name="password">
+    </p>
+    <p>
+        重复口令: <input type="password" id="password-2">
+    </p>
+    <p>
+        <button type="submit">提交</button> <button type="reset">重置</button>
+    </p>
+</form>
+```
+
+```javascript
+var checkRegisterForm = function () {
+    let user = document.getElementById('username');
+    let password = document.getElementById('password');
+    let password2 = document.getElementById('password-2');
+    let tip = document.getElementById('test-error');
+    let re1 = /\w{3,10}/;
+    let re2 = /[0-9a-zA-Z\_\$]{6,20}/;
+    if (!re1.test(user.value)) {
+    tip.innerText = '用户名错误';
+    return false;
+    } else if (!re2.test(password.value)) {
+    tip.innerText = '密码错误';
+    return false;
+    } else if (password.value !== password2.value) {
+    tip.innerText = '两次输入口令必须一致。';
+    return false;
+    } else {
+    
+        return true;
+    }
+    }
+
+// 测试:
+;(function () {
+    window.testFormHandler = checkRegisterForm;
+    var form = document.getElementById('test-register');
+    if (form.dispatchEvent) {
+        var event = new Event('submit', {
+            bubbles: true,
+            cancelable: true
+          });
+        form.dispatchEvent(event);
+    } else {
+        form.fireEvent('onsubmit');
+    }
+})();
+    
+```
+
