@@ -1071,6 +1071,102 @@ function checkForm() {
 
 #### 操作文件
 
+在HTML表单中，可以上传文件的唯一控件就是`<input type="file">`。
+
+```javascript
+// 对文件扩展名做检查
+
+var f = document.getElementById('test-file-upload');
+var filename = f.value; // 'C:\fakepath\test.png'
+if (!filename || !(filename.endsWith('.jpg') || filename.endsWith('.png') || filename.endsWith('.gif'))) {
+    alert('Can only upload image file.');
+    return false;
+}
+```
+HTML5的File API提供了File和FileReader两个主要对象，可以获得文件信息并读取文件。
+
+```javascript
+var
+    fileInput = document.getElementById('test-image-file'),
+    info = document.getElementById('test-file-info'),
+    preview = document.getElementById('test-image-preview');
+// 监听change事件:
+fileInput.addEventListener('change', function () {
+    // 清除背景图片:
+    preview.style.backgroundImage = '';
+    // 检查文件是否选择:
+    if (!fileInput.value) {
+        info.innerHTML = '没有选择文件';
+        return;
+    }
+    // 获取File引用:
+    var file = fileInput.files[0];
+    // 获取File信息:
+    info.innerHTML = '文件: ' + file.name + '<br>' +
+                     '大小: ' + file.size + '<br>' +
+                     '修改: ' + file.lastModifiedDate;
+    if (file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/gif') {
+        alert('不是有效的图片文件!');
+        return;
+    }
+    // 读取文件:
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var
+            data = e.target.result; // 'data:image/jpeg;base64,/9j/4AAQSk...(base64编码)...'            
+        preview.style.backgroundImage = 'url(' + data + ')';
+    };
+    // 以DataURL的形式读取文件:
+    reader.readAsDataURL(file);
+});
+```
+
+#### AJAX
+
+Asynchronous JavaScript and XML，意思就是用JavaScript执行异步网络请求。在现代浏览器上写AJAX主要依靠XMLHttpRequest对象：
+
+```javascript
+function success(text) {
+    var textarea = document.getElementById('test-response-text');
+    textarea.value = text;
+}
+
+function fail(code) {
+    var textarea = document.getElementById('test-response-text');
+    textarea.value = 'Error code: ' + code;
+}
+
+var request = new XMLHttpRequest(); // 新建XMLHttpRequest对象
+
+request.onreadystatechange = function () { // 状态发生变化时，函数被回调
+    if (request.readyState === 4) { // 成功完成
+        // 判断响应结果:
+        if (request.status === 200) {
+            // 成功，通过responseText拿到响应的文本:
+            return success(request.responseText);
+        } else {
+            // 失败，根据响应码判断失败原因:
+            return fail(request.status);
+        }
+    } else {
+        // HTTP请求还在继续...
+    }
+}
+
+// 发送请求:
+request.open('GET', '/api/categories');
+request.send();
+
+alert('请求已发送，请等待响应...');
+
+```
+
+浏览器的同源策略。默认情况下，JavaScript在发送AJAX请求时，URL的域名必须和当前页面完全一致。
+
+    理解JSONP，它有个限制，只能用GET请求，并且要求返回JavaScript。这种方式跨域实际上是利用了浏览器允许跨域引用JavaScript资源
+
+    理解CORS，全称Cross-Origin Resource Sharing，是HTML5规范定义的如何跨域访问资源。
+
 ### Node.js
 
 对于高性能，异步IO、事件驱动是基本原则.因为JavaScript是单线程执行，根本不能进行同步IO操作，所以，JavaScript的这一“缺陷”导致了它只能使用异步IO。
@@ -1097,12 +1193,97 @@ node --use_strict calc.js
 
 #### 模块
 
+在Node环境中，一个.js文件就称之为一个模块（module）。
 
+```javascript
+// hello.js文件,就是名为hello的模块
+
+'use strict';
+
+var s = 'Hello';
+
+function greet(name) {
+    console.log(s + ', ' + name + '!');
+}
+
+module.exports = greet;
+```
+
+```javascript
+// main.js文件，调用hello模块的greet函数
+
+'use strict';
+
+// 引入hello模块:
+var greet = require('./hello');
+
+var s = 'Michael';
+
+greet(s); // Hello, Michael!
+```
+
+这种模块加载机制被称为CommonJS规范。
+
+```javascript
+// hello.js
+
+function hello() {
+    console.log('Hello, world!');
+}
+
+function greet(name) {
+    console.log('Hello, ' + name + '!');
+}
+
+module.exports = {
+    hello: hello,
+    greet: greet
+};
+```
+
+#### 基本模块
+
+Node.js是运行在服务区端的JavaScript环境，服务器程序和浏览器程序相比，最大的特点是没有浏览器的安全限制了，而且，服务器程序必须能接收网络请求，读写文件，处理二进制内容，所以，Node.js内置的常用模块就是为了实现基本的服务器功能。
+
+global全局对象
+
+process
+
+```javascript
+> process === global.process;
+true
+> process.version;
+'v5.2.0'
+> process.platform;
+'darwin'
+> process.arch;
+'x64'
+> process.cwd(); //返回当前工作目录
+'/Users/michael'
+> process.chdir('/private/tmp'); // 切换当前工作目录
+undefined
+> process.cwd();
+'/private/tmp'
+```
+
+```javascript
+// 判断JavaScript执行环境
+
+if (typeof(window) === 'undefined') {
+    console.log('node.js');
+} else {
+    console.log('browser');
+}
+```
 ## 难点及疑问
 
 1. 理解排序算法，sort方法
 
 2. generator
+
+3. H5文件操作API
+
+4. CORS
 
 ## 参考资料
 
