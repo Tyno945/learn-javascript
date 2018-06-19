@@ -1167,6 +1167,11 @@ alert('请求已发送，请等待响应...');
 
     理解CORS，全称Cross-Origin Resource Sharing，是HTML5规范定义的如何跨域访问资源。
 
+#### Promise
+
+#### Canvas
+
+
 ### Node.js
 
 对于高性能，异步IO、事件驱动是基本原则.因为JavaScript是单线程执行，根本不能进行同步IO操作，所以，JavaScript的这一“缺陷”导致了它只能使用异步IO。
@@ -1275,6 +1280,124 @@ if (typeof(window) === 'undefined') {
     console.log('browser');
 }
 ```
+
+##### fs
+
+异步读文件
+
+```javascript
+// 异步读取时，传入的回调函数接收两个参数，当正常读取时，err参数为null，data参数为读取到的String。当读取发生错误时，err参数代表一个错误对象，data为undefined。
+
+// 异步读取一个文本文件
+'use strict';
+
+var fs = require('fs');
+
+fs.readFile('sample.txt', 'utf-8', function (err, data) {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log(data);
+    }
+});
+```
+
+
+```javascript
+// 异步读取时，传入的回调函数接收两个参数，当正常读取时，err参数为null，data参数为读取到的String。当读取发生错误时，err参数代表一个错误对象，data为undefined。
+
+// 异步读取一个二进制文件
+'use strict';
+
+var fs = require('fs');
+
+fs.readFile('sample.png', function (err, data) {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log(data);
+        console.log(data.length + ' bytes');
+    }
+});
+```
+
+同步读文件
+
+```javascript
+// 同步读取的函数和异步函数相比，多了一个Sync后缀，并且不接收回调函数，函数直接返回结果。
+
+'use strict';
+
+var fs = require('fs');
+
+try {
+    var data = fs.readFileSync('sample.txt', 'utf-8');
+    console.log(data);
+} catch (err) {
+    // 出错了
+}
+```
+
+写文件`fs.writeFile()`
+
+```javascript
+// 异步写文件
+'use strict';
+
+var fs = require('fs');
+
+var data = 'Hello, Node.js';
+fs.writeFile('output.txt', data, function (err) {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log('ok.');
+    }
+});
+```
+
+```javascript
+// 同步写文件
+'use strict';
+
+var fs = require('fs');
+
+var data = 'Hello, Node.js';
+fs.writeFileSync('output.txt', data);
+```
+
+获取文件信息`fs.stat()`
+
+```javascript
+'use strict';
+
+var fs = require('fs');
+
+fs.stat('sample.txt', function (err, stat) {
+    if (err) {
+        console.log(err);
+    } else {
+        // 是否是文件:
+        console.log('isFile: ' + stat.isFile());
+        // 是否是目录:
+        console.log('isDirectory: ' + stat.isDirectory());
+        if (stat.isFile()) {
+            // 文件大小:
+            console.log('size: ' + stat.size);
+            // 创建时间, Date对象:
+            console.log('birth time: ' + stat.birthtime);
+            // 修改时间, Date对象:
+            console.log('modified time: ' + stat.mtime);
+        }
+    }
+});
+```
+##### stream
+
+##### http
+
+##### crypto
+
 ## 难点及疑问
 
 1. 理解排序算法，sort方法
@@ -1284,6 +1407,12 @@ if (typeof(window) === 'undefined') {
 3. H5文件操作API
 
 4. CORS
+
+5. Promise
+
+6. javascript执行机制，同步和异步方法
+
+[javascript的执行机制](https://juejin.im/post/59e85eebf265da430d571f89)
 
 ## 参考资料
 
