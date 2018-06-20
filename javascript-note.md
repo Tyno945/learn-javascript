@@ -1192,6 +1192,34 @@ Hello, world.
 node --use_strict calc.js
 ```
 
+Node.js 应用是由哪几部分组成的：
+
+    1. 引入 required 模块：我们可以使用 require 指令来载入 Node.js 模块。
+
+    2. 创建服务器：服务器可以监听客户端的请求，类似于 Apache 、Nginx 等 HTTP 服务器。
+
+    3. 接收请求与响应请求 服务器很容易创建，客户端可以使用浏览器或终端发送 HTTP 请求，服务器接收请求后返回响应数据。
+
+```javascript
+var http = require('http');
+
+http.createServer(function (request, response) {
+
+    // 发送 HTTP 头部 
+    // HTTP 状态值: 200 : OK
+    // 内容类型: text/plain
+    response.writeHead(200, {'Content-Type': 'text/plain'});
+
+    // 发送响应数据 "Hello World"
+    response.end('Hello World\n');
+}).listen(8888);
+
+// 终端打印如下信息
+console.log('Server running at http://127.0.0.1:8888/');
+```
+
+
+
 搭建Node开发环境
 
 [运行和调试JavaScript](https://www.bilibili.com/video/av5827351/)
@@ -1244,6 +1272,65 @@ module.exports = {
     hello: hello,
     greet: greet
 };
+```
+#### NPM 使用介绍
+
+npm 安装 Node.js 模块语法格式如下：
+
+```javascript
+$ npm install <Module Name>
+
+npm install express          // 本地安装
+npm install express -g   // 全局安装
+
+npm list -g     // 查看安装信息
+
+$ npm list express -g    // 查看某个模块的版本号
+
+$ npm uninstall express // 卸载模块
+
+$ npm update express    // 更新模块
+
+$ npm search express    // 搜索模块
+
+$ npm init  // 创建模块
+
+var express = require('express');
+```
+package.json 位于模块的目录位于 `node_modules/express/package.json` 下，用于定义包的属性。
+
+#### Node.js 事件循环
+
+事件就是需要 eventEmitter.on 去绑定一个事件通过eventEmitter.emit 去触发这个事件其次说的是 事件的 接收 和 发生 是分开的 就像 一个外卖店你可以不停的接受很多订单, 接受以后开始告诉厨师去做外卖, 做好的外卖对应的外送给每个用户，如果单线程的话那只能是接收一个订单, 做好以后在接收下一个外卖订单，明显效率非常低。
+
+事件可以不停的接受不停的发生也是为了提高效率。
+
+```javascript
+// 引入 events 模块
+var events = require('events');
+// 创建 eventEmitter 对象
+var eventEmitter = new events.EventEmitter();
+
+// 创建事件处理程序
+var connectHandler = function connected() {
+   console.log('连接成功。');
+  
+   // 触发 data_received 事件 
+   eventEmitter.emit('data_received');
+}
+
+// 绑定 connection 事件处理程序
+eventEmitter.on('connection', connectHandler);
+ 
+// 使用匿名函数绑定 data_received 事件
+eventEmitter.on('data_received', function(){
+   console.log('数据接收成功。');
+});
+
+// 触发 connection 事件 
+eventEmitter.emit('connection');
+
+console.log("程序执行完毕。");
 ```
 
 #### 基本模块
@@ -1417,3 +1504,5 @@ fs.stat('sample.txt', function (err, stat) {
 ## 参考资料
 
 [廖雪峰JavaScript教程](https://www.liaoxuefeng.com/wiki/001434446689867b27157e896e74d51a89c25cc8b43bdb3000)
+
+[菜鸟教程NodeJs教程](http://www.runoob.com/nodejs/nodejs-tutorial.html)
