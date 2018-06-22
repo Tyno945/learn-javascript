@@ -1705,6 +1705,19 @@ Web应用开发阶段：
 4. MVC：Web应用也引入了Model-View-Controller的模式，来简化Web开发。
 5. MVVM：Model-View-ViewModel。MVVM的设计思想：关注Model的变化，让MVVM框架去自动更新DOM的状态，从而把开发者从操作DOM的繁琐步骤中解脱出来！
 6. Node.js
+
+#### koa
+
+#### MySQL
+
+#### mocha
+
+#### WebSocket
+
+#### REST
+
+#### MVVM
+
 ## 难点及疑问
 
 1. 理解排序算法，sort方法

@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "启动程序",
-            "program": "${workspaceFolder}/sample\\hello-server.js"
+            "program": "${workspaceFolder}/sample/hello-koa/app.js"
         }
     ]
 }
