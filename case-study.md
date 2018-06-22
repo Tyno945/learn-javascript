@@ -47,7 +47,7 @@ while (i < arr.length) {
 }
 ```
 
-### sum函数
+### 案例 sum函数
 
 编写一个sum()函数，接收任意个参数并返回它们的和
 
@@ -89,7 +89,7 @@ if (sum() !== 0) {
 }
 ```
 
-### 利用map和reduce操作实现一个string2int()函数
+### 案例 利用map和reduce操作实现一个string2int()函数
 ```javascript
 'use strict';
 
@@ -111,7 +111,7 @@ else {
     console.log('测试失败!');
 }
 ```
-### 去除Array的重复元素
+### 案例 去除Array的重复元素
 
 ```javascript
 'use strict';
@@ -126,7 +126,7 @@ r = arr.filter(function (element, index, self) {
 console.log(r.toString());
 ```
 
-### 筛选素数
+### 案例 筛选素数
 
 ```javascript
 function get_primes(arr) {
@@ -147,7 +147,7 @@ function isprime(x) {
 }}
 ```
 
-### 创建一个计数器
+### 案例 创建一个计数器
 
 ```javascript
 'use strict';
@@ -174,7 +174,7 @@ c2.inc(); // 13
 
 ```
 
-### 产生斐波那契数列的函数
+### 案例 产生斐波那契数列的函数
 
 ```javascript
 function fib(max) {
@@ -195,7 +195,7 @@ fib(5); // [0, 1, 1, 2, 3]
 fib(10); // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 ```
 
-### 用generator写一个自增ID
+### 案例 用generator写一个自增ID
 
 ```javascript
 // 1、用while条件判断
@@ -296,7 +296,7 @@ $.getJSON(url, function (data) {
 
 ```
 
-### 提交表单检测
+### 案例 提交表单检测
 
 利用JavaScript检查用户注册信息是否正确，在以下情况不满足时报错并阻止提交表单：
 

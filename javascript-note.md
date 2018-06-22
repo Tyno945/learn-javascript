@@ -1481,10 +1481,230 @@ fs.stat('sample.txt', function (err, stat) {
 ```
 ##### stream
 
+从文件流读取文本内容
+
+```javascript
+'use strict';
+
+var fs = require('fs');
+
+// 打开一个流:
+var rs = fs.createReadStream('sample.txt', 'utf-8');
+
+rs.on('data', function (chunk) {
+    console.log('DATA:')
+    console.log(chunk);
+});
+
+rs.on('end', function () {
+    console.log('END');
+});
+
+rs.on('error', function (err) {
+    console.log('ERROR: ' + err);
+});
+```
+
+以流的形式写入文件，只需要不断调用write()方法，最后以end()结束
+
+```javascript
+'use strict';
+
+var fs = require('fs');
+
+var ws1 = fs.createWriteStream('output1.txt', 'utf-8');
+ws1.write('使用Stream写入文本数据...\n');
+ws1.write('END.');
+ws1.end();
+
+var ws2 = fs.createWriteStream('output2.txt');
+ws2.write(new Buffer('使用Stream写入二进制数据...\n', 'utf-8'));
+ws2.write(new Buffer('END.', 'utf-8'));
+ws2.end();
+```
+
+pipe()把一个文件流和另一个文件流串起来，这样源文件的所有数据就自动写入到目标文件里了，所以，这实际上是一个复制文件的程序
+
+```javascript
+'use strict';
+
+var fs = require('fs');
+
+var rs = fs.createReadStream('sample.txt');
+var ws = fs.createWriteStream('copied.txt');
+
+rs.pipe(ws);
+```
 ##### http
+
+    了解HTTP协议，HTTP格式
+    理解HTTP请求流程
+
+HTTP服务器
+
+```javascript
+'use strict';
+
+// 导入http模块:
+var http = require('http');
+
+// 创建http server，并传入回调函数:
+var server = http.createServer(function (request, response) {
+    // 回调函数接收request和response对象,
+    // 获得HTTP请求的method和url:
+    console.log(request.method + ': ' + request.url);
+    // 将HTTP响应200写入response, 同时设置Content-Type: text/html:
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    // 将HTTP响应的HTML内容写入response:
+    response.end('<h1>Hello world!</h1>');
+});
+
+// 让服务器监听8080端口:
+server.listen(8080);
+
+console.log('Server is running at http://127.0.0.1:8080/');
+```
+
+文件服务器
+
+```javascript
+'use strict';
+
+var url = require('url');
+
+console.log(url.parse('http://user:pass@host.com:8080/path/to/file?query=string#hash'));
+
+// 结果
+Url {
+  protocol: 'http:',
+  slashes: true,
+  auth: 'user:pass',
+  host: 'host.com:8080',
+  port: '8080',
+  hostname: 'host.com',
+  hash: '#hash',
+  search: '?query=string',
+  query: 'query=string',
+  pathname: '/path/to/file',
+  path: '/path/to/file?query=string',
+  href: 'http://user:pass@host.com:8080/path/to/file?query=string#hash' }
+```
 
 ##### crypto
 
+    理解摘要算法，又称哈希算法、散列算法。
+
+    摘要算法就是通过摘要函数f()对任意长度的数据data计算出固定长度的摘要digest，目的是为了发现原始数据是否被人篡改过。
+
+MD5和SHA1
+
+MD5是最常见的摘要算法，速度很快，生成结果是固定的128 bit字节，通常用一个32位的16进制字符串表示。
+
+SHA1的结果是160 bit字节，通常用一个40位的16进制字符串表示。
+
+```javascript
+const crypto = require('crypto');
+
+const hash = crypto.createHash('md5');
+
+// 可任意多次调用update():
+hash.update('Hello, world!');
+hash.update('Hello, nodejs!');
+
+console.log(hash.digest('hex')); // 7e1977739c748beac0c0fd14fd26a544
+```
+
+要注意摘要算法不是加密算法，不能用于加密（因为无法通过摘要反推明文），只能用于防篡改，但是它的单向计算特性决定了可以在不存储明文口令的情况下验证用户口令。
+
+Hmac
+
+可以把Hmac理解为用随机数“增强”的哈希算法。
+
+```javascript
+const crypto = require('crypto');
+
+const hmac = crypto.createHmac('sha256', 'secret-key');
+
+hmac.update('Hello, world!');
+hmac.update('Hello, nodejs!');
+
+console.log(hmac.digest('hex')); // 80f7e22570bed1fa3ef683edce5d0890e268e1ca8d1bd0c382bc766f3744be9f
+```
+
+AES
+
+AES是一种常用的对称加密算法，加解密都用同一个密钥。
+
+```javascript
+const crypto = require('crypto');
+
+function aesEncrypt(data, key) {
+    const cipher = crypto.createCipher('aes192', key);
+    var crypted = cipher.update(data, 'utf8', 'hex');
+    crypted += cipher.final('hex');
+    return crypted;
+}
+
+function aesDecrypt(encrypted, key) {
+    const decipher = crypto.createDecipher('aes192', key);
+    var decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+}
+
+var data = 'Hello, this is a secret message!';
+var key = 'Password!';
+var encrypted = aesEncrypt(data, key);
+var decrypted = aesDecrypt(encrypted, key);
+
+console.log('Plain text: ' + data);
+console.log('Encrypted text: ' + encrypted);
+console.log('Decrypted text: ' + decrypted);
+
+// Plain text: Hello, this is a secret message!
+// Encrypted text: 8a944d97bdabc157a5b7a40cb180e7...
+// Decrypted text: Hello, this is a secret message!
+```
+
+Diffie-Hellman
+
+DH算法是一种密钥交换协议，它可以让双方在不泄漏密钥的情况下协商出一个密钥来。
+
+```javascript
+const crypto = require('crypto');
+
+// xiaoming's keys:
+var ming = crypto.createDiffieHellman(512);
+var ming_keys = ming.generateKeys();
+
+var prime = ming.getPrime();
+var generator = ming.getGenerator();
+
+console.log('Prime: ' + prime.toString('hex'));
+console.log('Generator: ' + generator.toString('hex'));
+
+// xiaohong's keys:
+var hong = crypto.createDiffieHellman(prime, generator);
+var hong_keys = hong.generateKeys();
+
+// exchange and generate secret:
+var ming_secret = ming.computeSecret(hong_keys);
+var hong_secret = hong.computeSecret(ming_keys);
+
+// print secret:
+console.log('Secret of Xiao Ming: ' + ming_secret.toString('hex'));
+console.log('Secret of Xiao Hong: ' + hong_secret.toString('hex'));
+```
+
+### Web开发
+
+Web应用开发阶段：
+1. 静态Web页面
+2. CGI：Common Gateway Interface，用C/C++编写。
+3. ASP/JSP/PHP
+4. MVC：Web应用也引入了Model-View-Controller的模式，来简化Web开发。
+5. MVVM：Model-View-ViewModel。MVVM的设计思想：关注Model的变化，让MVVM框架去自动更新DOM的状态，从而把开发者从操作DOM的繁琐步骤中解脱出来！
+6. Node.js
 ## 难点及疑问
 
 1. 理解排序算法，sort方法
