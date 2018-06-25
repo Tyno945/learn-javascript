@@ -1708,6 +1708,134 @@ Web应用开发阶段：
 
 #### koa
 
+```javascript
+// 导入koa，和koa 1.x不同，在koa2中，我们导入的是一个class，因此用大写的Koa表示:
+const Koa = require('koa');
+
+// 创建一个Koa对象表示web app本身:
+const app = new Koa();
+
+// 对于任何请求，app将调用该异步函数处理请求：
+app.use(async (ctx, next) => {
+    await next();
+    // 设置response的Content-Type:
+    ctx.response.type = 'text/html';
+    // 设置response的内容:
+    ctx.response.body = '<h1>Hello, koa2!</h1>';
+});
+
+// 在端口3000监听:
+app.listen(3000);
+console.log('app started at port 3000...');
+```
+
+koa middleware
+
+    koa把很多async函数组成一个处理链，每个async函数都可以做一些自己的事情，然后用await next()来调用下一个async函数。我们把每个async函数称为middleware，这些middleware可以组合起来，完成很多有用的功能。
+
+可以用以下3个middleware组成处理链，依次打印日志，记录处理时间，输出HTML：
+
+```javascript
+app.use(async (ctx, next) => {
+    console.log(`${ctx.request.method} ${ctx.request.url}`); // 打印URL
+    await next(); // 调用下一个middleware
+});
+
+app.use(async (ctx, next) => {
+    const start = new Date().getTime(); // 当前时间
+    await next(); // 调用下一个middleware
+    const ms = new Date().getTime() - start; // 耗费时间
+    console.log(`Time: ${ms}ms`); // 打印耗费时间
+});
+
+app.use(async (ctx, next) => {
+    await next();
+    ctx.response.type = 'text/html';
+    ctx.response.body = '<h1>Hello, koa2!</h1>';
+});
+```
+
+```javascript
+const Koa=require('koa');
+const app=new Koa();
+app.use(async (ctx, next) => {
+    console.log('第一1');
+    await next(); // 调用下一个middleware
+    console.log('第一2');
+});
+
+app.use(async (ctx, next) => {
+    console.log('第二1');
+    await next(); // 调用下一个middleware
+    console.log('第二2');
+});
+
+app.use(async (ctx, next) => {
+    console.log('第三1');
+    await next();
+    console.log('第三2');
+});
+app.listen(3000);
+
+
+// 输出顺序：
+// 第一1
+// 第二1
+// 第三1
+// 第三2
+// 第二2
+// 第一2
+```
+
+koa-router
+
+```javascript
+const Koa = require('koa');
+
+// 注意require('koa-router')返回的是函数:
+const router = require('koa-router')();
+
+const app = new Koa();
+
+// log request URL:
+app.use(async (ctx, next) => {
+    console.log(`Process ${ctx.request.method} ${ctx.request.url}...`);
+    await next();
+});
+
+// add url-route:
+router.get('/hello/:name', async (ctx, next) => {
+    var name = ctx.params.name;
+    ctx.response.body = `<h1>Hello, ${name}!</h1>`;
+});
+
+router.get('/', async (ctx, next) => {
+    ctx.response.body = '<h1>Index</h1>';
+});
+
+// add router middleware:
+app.use(router.routes());
+
+app.listen(3000);
+console.log('app started at port 3000...');
+```
+
+理解代码重构
+
+    确保每个函数功能非常简单，一眼能看明白，是代码可维护的关键。
+
+    经过重新整理后的工程url2-koa目前具备非常好的模块化，所有处理URL的函数按功能组存放在controllers目录，今后我们也只需要不断往这个目录下加东西就可以了，app.js保持不变。
+
+Nunjucks
+
+    模板引擎就是基于模板配合数据构造出字符串输出的一个组件。
+
+    Nunjucks模板引擎最强大的功能在于模板的继承。
+
+MVC：Model-View-Controller
+
+    重点掌握MVC编程
+
 #### MySQL
 
 #### mocha
