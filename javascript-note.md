@@ -1838,6 +1838,61 @@ MVC：Model-View-Controller
 
 #### MySQL
 
+
+
+```javascript
+// 连接MySQL服务器
+mysql -u root -p
+
+// 显示数据库
+show databases;
+```
+
+ORM
+
+    ORM技术：Object-Relational Mapping，把关系数据库的表结构映射到对象上。
+
+    我们选择Node的ORM框架Sequelize来操作数据库。这样，我们读写的都是JavaScript对象，Sequelize帮我们把对象变成数据库中的行。
+
+```javascript
+// 直接使用mysql包提供的接口
+connection.query('SELECT * FROM users WHERE id = ?', ['123'], function(err, rows) {
+    if (err) {
+        // error
+    } else {
+        for (let row in rows) {
+            processRow(row);
+        }
+    }
+});
+
+// 用Sequelize查询pets表
+Pet.findAll()
+   .then(function (pets) {
+       for (let pet in pets) {
+           console.log(`${pet.id}: ${pet.name}`);
+       }
+   }).catch(function (err) {
+       // error
+   });
+
+// 用ES7的await来调用任何一个Promise对象
+(async () => {
+    var pets = await Pet.findAll();
+})();
+```
+使用Sequelize
+
+    使用Sequelize操作数据库的一般步骤就是：
+
+    首先，通过某个Model对象的findAll()方法获取实例；
+
+    如果要更新实例，先对实例属性赋新值，再调用save()方法；
+
+    如果要删除实例，直接调用destroy()方法。
+
+    注意findAll()方法可以接收where、order这些参数，这和将要生成的SQL语句是对应的。
+
 #### mocha
 
 #### WebSocket
@@ -1845,6 +1900,10 @@ MVC：Model-View-Controller
 #### REST
 
 #### MVVM
+
+    MVVM是Model-View-ViewModel的缩写。
+
+    MVVM的设计思想：关注Model的变化，让MVVM框架去自动更新DOM的状态，从而把开发者从操作DOM的繁琐步骤中解脱出来！
 
 ## 难点及疑问
 
@@ -1859,6 +1918,8 @@ MVC：Model-View-Controller
 5. Promise
 
 6. javascript执行机制，同步和异步方法
+
+7. Sequelize最佳实践
 
 [javascript的执行机制](https://juejin.im/post/59e85eebf265da430d571f89)
 
