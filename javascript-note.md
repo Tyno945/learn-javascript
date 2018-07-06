@@ -43,23 +43,30 @@
         - [3.2.5. AJAX](#325-ajax)
         - [3.2.6. Promise](#326-promise)
         - [3.2.7. Canvas](#327-canvas)
-    - [3.3. Node.js](#33-nodejs)
-        - [3.3.1. 安装Node.js和npm](#331-安装nodejs和npm)
-        - [3.3.2. 模块](#332-模块)
-        - [3.3.3. NPM 使用介绍](#333-npm-使用介绍)
-        - [3.3.4. Node.js 事件循环](#334-nodejs-事件循环)
-        - [3.3.5. 基本模块](#335-基本模块)
-            - [3.3.5.1. fs](#3351-fs)
-            - [3.3.5.2. stream](#3352-stream)
-            - [3.3.5.3. http](#3353-http)
-            - [3.3.5.4. crypto](#3354-crypto)
-    - [3.4. Web开发](#34-web开发)
-        - [3.4.1. koa](#341-koa)
-        - [3.4.2. MySQL](#342-mysql)
-        - [3.4.3. mocha](#343-mocha)
-        - [3.4.4. WebSocket](#344-websocket)
-        - [3.4.5. REST](#345-rest)
-        - [3.4.6. MVVM](#346-mvvm)
+    - [3.3. jQuery](#33-jquery)
+        - [jQuery简介](#jquery简介)
+        - [选择器](#选择器)
+        - [操作DOM](#操作dom)
+        - [事件](#事件)
+    - [错误处理](#错误处理)
+    - [underscore](#underscore)
+    - [3.4. Node.js](#34-nodejs)
+        - [3.4.1. 安装Node.js和npm](#341-安装nodejs和npm)
+        - [3.4.2. 模块](#342-模块)
+        - [3.4.3. NPM 使用介绍](#343-npm-使用介绍)
+        - [3.4.4. Node.js 事件循环](#344-nodejs-事件循环)
+        - [3.4.5. 基本模块](#345-基本模块)
+            - [3.4.5.1. fs](#3451-fs)
+            - [3.4.5.2. stream](#3452-stream)
+            - [3.4.5.3. http](#3453-http)
+            - [3.4.5.4. crypto](#3454-crypto)
+    - [3.5. Web开发](#35-web开发)
+        - [3.5.1. koa](#351-koa)
+        - [3.5.2. MySQL](#352-mysql)
+        - [3.5.3. mocha](#353-mocha)
+        - [3.5.4. WebSocket](#354-websocket)
+        - [3.5.5. REST](#355-rest)
+        - [3.5.6. MVVM](#356-mvvm)
 - [4. React](#4-react)
 - [5. 难点及疑问](#5-难点及疑问)
 - [6. 参考资料](#6-参考资料)
@@ -1239,8 +1246,415 @@ alert('请求已发送，请等待响应...');
 
 #### 3.2.7. Canvas
 
+### 3.3. jQuery
 
-### 3.3. Node.js
+#### jQuery简介
+
+jQuery能帮我们干这些事情：
+
+* 消除浏览器差异：你不需要自己写冗长的代码来针对不同的浏览器来绑定事件，编写AJAX等代码；
+
+* 简洁的操作DOM的方法：写`$('#test')`肯定比`document.getElementById('test')`来得简洁；
+
+* 轻松实现动画、修改CSS等各种操作。
+
+使用jQuery只需要在页面的<head>引入jQuery文件即可。
+
+实际上，jQuery把所有功能全部封装在一个全局变量jQuery中，而$也是一个合法的变量名，它是变量jQuery的别名。
+
+```javascript
+window.jQuery; // ƒ (e,b3){return new bI.fn.init(e,b3,w)}
+window.$; // ƒ (e,b3){return new bI.fn.init(e,b3,w)}
+$ === jQuery; // true
+typeof($); // 'function'
+```
+$本质上就是一个函数，但是函数也是对象，于是$除了可以直接调用外，也可以有很多其他属性。
+
+#### 选择器
+
+基本选择器
+
+```javascript
+// 1. 按ID查找 
+// 查找<div id="abc">:
+var div = $('#abc');
+
+// 2. 按tag查找
+var ps = $('p'); // 返回所有<p>节点
+
+// 3. 按class查找
+var a = $('.red'); // 所有节点包含`class="red"`都将返回
+var a = $('.red.green'); // 注意没有空格！
+
+// 4. 按属性查找
+var email = $('[name=email]'); // 找出<??? name="email">
+var passwordInput = $('[type=password]'); // 找出<??? type="password">
+var a = $('[items="A B"]'); // 找出<??? items="A B">
+
+var icons = $('[name^=icon]'); // 找出所有name属性值以icon开头的DOM
+// 例如: name="icon-1", name="icon-2"
+var names = $('[name$=with]'); // 找出所有name属性值以with结尾的DOM
+// 例如: name="startswith", name="endswith"
+
+var icons = $('[class^="icon-"]'); // 找出所有class包含至少一个以`icon-`开头的DOM
+// 例如: class="icon-clock", class="abc icon-home"
+
+// 5. 组合查找
+var emailInput = $('input[name=email]'); // 不会找出<div name="email">
+
+var tr = $('tr.red'); // 找出<tr class="red ...">...</tr>
+
+// 6. 多项选择器
+$('p,div'); // 把<p>和<div>都选出来
+$('p.red,p.green'); // 把<p class="red">和<p class="green">都选出来
+```
+
+层级选择器
+
+如果两个DOM元素具有层级关系，就可以用$('ancestor descendant')来选择，层级之间用空格隔开。
+
+```javascript
+<!-- HTML结构 -->
+<div class="testing">
+    <ul class="lang">
+        <li class="lang-javascript">JavaScript</li>
+        <li class="lang-python">Python</li>
+        <li class="lang-lua">Lua</li>
+    </ul>
+</div>
+
+$('ul.lang li');
+$('form[name=upload] input');
+
+// 子选择器（Child Selector）
+$('parent>child')
+$('ul.lang>li.lang-javascript'); // 可以选出[<li class="lang-javascript">JavaScript</li>]
+$('div.testing>li.lang-javascript'); // [], 无法选出，因为<div>和<li>不构成父子关系
+
+// 过滤器（Filter）
+$('ul.lang li'); // 选出JavaScript、Python和Lua 3个节点
+
+$('ul.lang li:first-child'); // 仅选出JavaScript
+$('ul.lang li:last-child'); // 仅选出Lua
+$('ul.lang li:nth-child(2)'); // 选出第N个元素，N从1开始
+$('ul.lang li:nth-child(even)'); // 选出序号为偶数的元素
+$('ul.lang li:nth-child(odd)'); // 选出序号为奇数的元素
+
+$('div:visible'); // 所有可见的div
+$('div:hidden'); // 所有隐藏的div
+
+```
+
+表单相关
+
+针对表单元素，jQuery还有一组特殊的选择器：
+
+* :input：可以选择`<input>`，`<textarea>`，`<select>`和`<button>`；
+
+* :file：可以选择`<input type="file">`，和`input[type=file]`一样；
+
+* :checkbox：可以选择复选框，和`input[type=checkbox]`一样；
+
+* :radio：可以选择单选框，和`input[type=radio]`一样；
+
+* :focus：可以选择当前输入焦点的元素，例如把光标放到一个`<input>`上，用`$('input:focus')`就可以选出；
+
+* :checked：选择当前勾上的单选框和复选框，用这个选择器可以立刻获得用户选择的项目，如`$('input[type=radio]:checked')`；
+
+* :enabled：可以选择可以正常输入的`<input>、<select>`等，也就是没有灰掉的输入；
+
+* :disabled：和:enabled正好相反，选择那些不能输入的。
+
+查找和过滤
+
+```javascript
+<!-- HTML结构 -->
+<ul class="lang">
+    <li class="js dy">JavaScript</li>
+    <li class="dy">Python</li>
+    <li id="swift">Swift</li>
+    <li class="dy">Scheme</li>
+    <li name="haskell">Haskell</li>
+</ul>
+
+// 用find()查找
+var ul = $('ul.lang'); // 获得<ul>
+var dy = ul.find('.dy'); // 获得JavaScript, Python, Scheme
+var swf = ul.find('#swift'); // 获得Swift
+var hsk = ul.find('[name=haskell]'); // 获得Haskell
+
+// 使用parent()
+var swf = $('#swift'); // 获得Swift
+var parent = swf.parent(); // 获得Swift的上层节点<ul>
+var a = swf.parent('.red'); // 获得Swift的上层节点<ul>，同时传入过滤条件。如果ul不符合条件，返回空jQuery对象
+
+// next()和prev()方法
+var swift = $('#swift');
+
+swift.next(); // Scheme
+swift.next('[name=haskell]'); // 空的jQuery对象，因为Swift的下一个元素Scheme不符合条件[name=haskell]
+
+swift.prev(); // Python
+swift.prev('.dy'); // Python，因为Python同时符合过滤器条件.dy
+
+// filter()方法
+var langs = $('ul.lang li'); // 拿到JavaScript, Python, Swift, Scheme和Haskell
+var a = langs.filter('.dy'); // 拿到JavaScript, Python, Scheme
+
+var langs = $('ul.lang li'); // 拿到JavaScript, Python, Swift, Scheme和Haskell
+langs.filter(function () {
+    return this.innerHTML.indexOf('S') === 0; // 返回S开头的节点
+}); // 拿到Swift, Scheme
+
+// map()方法
+var langs = $('ul.lang li'); // 拿到JavaScript, Python, Swift, Scheme和Haskell
+var arr = langs.map(function () {
+    return this.innerHTML;
+}).get(); // 用get()拿到包含string的Array：['JavaScript', 'Python', 'Swift', 'Scheme', 'Haskell']
+
+// first()、last()和slice()方法可以返回一个新的jQuery对象
+var langs = $('ul.lang li'); // 拿到JavaScript, Python, Swift, Scheme和Haskell
+var js = langs.first(); // JavaScript，相当于$('ul.lang li:first-child')
+var haskell = langs.last(); // Haskell, 相当于$('ul.lang li:last-child')
+var sub = langs.slice(2, 4); // Swift, Scheme, 参数和数组的slice()方法一致
+```
+#### 操作DOM
+
+修改Text和HTML
+
+```javascript
+<!-- HTML结构 -->
+<ul id="test-ul">
+    <li class="js">JavaScript</li>
+    <li name="book">Java &amp; JavaScript</li>
+</ul>
+
+$('#test-ul li[name=book]').text(); // 'Java & JavaScript'
+$('#test-ul li[name=book]').html(); // 'Java &amp; JavaScript'
+
+$('#test-ul li').text('JS'); // 是不是两个节点都变成了JS？
+
+
+```
+
+修改CSS
+
+```javascript
+var div = $('#test-div');
+div.css('color'); // '#000033', 获取CSS属性
+div.css('color', '#336699'); // 设置CSS属性
+div.css('color', ''); // 清除CSS属性
+```
+
+修改class
+
+```javascript
+var div = $('#test-div');
+div.hasClass('highlight'); // false， class是否包含highlight
+div.addClass('highlight'); // 添加highlight这个class
+div.removeClass('highlight'); // 删除highlight这个class
+```
+显示和隐藏DOM
+
+```javascript
+var a = $('a[target=_blank]');
+a.hide(); // 隐藏
+a.show(); // 显示
+```
+
+获取DOM信息
+
+```javascript
+// 浏览器可视窗口大小:
+$(window).width(); // 800
+$(window).height(); // 600
+
+// HTML文档大小:
+$(document).width(); // 800
+$(document).height(); // 3500
+
+// 某个div的大小:
+var div = $('#test-div');
+div.width(); // 600
+div.height(); // 300
+div.width(400); // 设置CSS属性 width: 400px，是否生效要看CSS是否有效
+div.height('200px'); // 设置CSS属性 height: 200px，是否生效要看CSS是否有效
+```
+
+修改属性
+
+```javascript
+// <div id="test-div" name="Test" start="1">...</div>
+var div = $('#test-div');
+div.attr('data'); // undefined, 属性不存在
+div.attr('name'); // 'Test'
+div.attr('name', 'Hello'); // div的name属性变为'Hello'
+div.removeAttr('name'); // 删除name属性
+div.attr('name'); // undefined
+```
+
+操作表单
+
+```javascript
+/*
+    <input id="test-input" name="email" value="">
+    <select id="test-select" name="city">
+        <option value="BJ" selected>Beijing</option>
+        <option value="SH">Shanghai</option>
+        <option value="SZ">Shenzhen</option>
+    </select>
+    <textarea id="test-textarea">Hello</textarea>
+*/
+var
+    input = $('#test-input'),
+    select = $('#test-select'),
+    textarea = $('#test-textarea');
+
+input.val(); // 'test'
+input.val('abc@example.com'); // 文本框的内容已变为abc@example.com
+
+select.val(); // 'BJ'
+select.val('SH'); // 选择框已变为Shanghai
+
+textarea.val(); // 'Hello'
+textarea.val('Hi'); // 文本区域已更新为'Hi'
+```
+
+修改DOM结构
+
+```javascript
+/* <div id="test-div">
+    <ul>
+        <li><span>JavaScript</span></li>
+        <li><span>Python</span></li>
+        <li><span>Swift</span></li>
+    </ul>
+</div> */
+
+// 新增DOM
+// append()把DOM添加到最后，prepend()则把DOM添加到最前。同级节点可以用after()或者before()方法。
+
+var ul = $('#test-div>ul');
+ul.append('<li><span>Haskell</span></li>');
+
+// 创建DOM对象:
+var ps = document.createElement('li');
+ps.innerHTML = '<span>Pascal</span>';
+// 添加DOM对象:
+ul.append(ps);
+
+// 添加jQuery对象:
+ul.append($('#scheme'));
+
+// 添加函数对象:
+ul.append(function (index, html) {
+    return '<li><span>Language - ' + index + '</span></li>';
+});
+
+// 删除DOM
+var li = $('#test-div>ul>li');
+li.remove(); // 所有<li>全被删除
+```
+
+#### 事件
+
+jQuery能够绑定的事件主要包括：
+
+鼠标事件
+* click: 鼠标单击时触发；
+* dblclick：鼠标双击时触发；
+* mouseenter：鼠标进入时触发；
+* mouseleave：鼠标移出时触发；
+* mousemove：鼠标在DOM内部移动时触发；
+* hover：鼠标进入和退出时触发两个函数，相当于mouseenter加上mouseleave。
+
+键盘事件
+键盘事件仅作用在当前焦点的DOM上，通常是<input>和<textarea>。
+
+* keydown：键盘按下时触发；
+* keyup：键盘松开时触发；
+* keypress：按一次键后触发。
+
+其他事件
+* focus：当DOM获得焦点时触发；
+* blur：当DOM失去焦点时触发；
+* change：当<input>、<select>或<textarea>的内容改变时触发；
+* submit：当<form>提交时触发；
+* ready：当页面被载入并且DOM树完成初始化后触发。
+
+```javascript
+/* HTML:
+ *
+ * <a id="test-link" href="#0">点我试试</a>
+ *
+ */
+
+// 获取超链接的jQuery对象:
+var a = $('#test-link');
+a.on('click', function () {
+    alert('Hello!');
+});
+```
+
+```html
+<html>
+<head>
+    <script>
+        $(document).on('ready', function () {
+            $('#testForm').on('submit', function () {
+                alert('submit!');
+            });
+        });
+    </script>
+</head>
+<body>
+    <form id="testForm">
+        ...
+    </form>
+</body>
+
+```
+
+如果你遇到$(function () {...})的形式，牢记这是document对象的ready事件处理函数。
+
+```javascript
+$(function () {
+    console.log('init A...');
+});
+$(function () {
+    console.log('init B...');
+});
+$(function () {
+    console.log('init C...');
+});
+```
+所有事件都会传入Event对象作为参数，可以从Event对象上获取到更多的信息
+```javascript
+$(function () {
+    $('#testMouseMoveDiv').mousemove(function (e) {
+        $('#testMouseMoveSpan').text('pageX = ' + e.pageX + ', pageY = ' + e.pageY);
+    });
+});
+```
+取消绑定
+```javascript
+function hello() {
+    alert('hello!');
+}
+
+a.click(hello); // 绑定事件
+
+// 10秒钟后解除绑定:
+setTimeout(function () {
+    a.off('click', hello);
+}, 10000);
+```
+
+### 错误处理
+
+### underscore
+
+### 3.4. Node.js
 
 对于高性能，异步IO、事件驱动是基本原则.因为JavaScript是单线程执行，根本不能进行同步IO操作，所以，JavaScript的这一“缺陷”导致了它只能使用异步IO。
 
@@ -1248,7 +1662,7 @@ alert('请求已发送，请等待响应...');
 
 最大的优势是借助JavaScript天生的事件驱动机制加V8高性能引擎，使编写高性能Web服务轻而易举。
 
-#### 3.3.1. 安装Node.js和npm
+#### 3.4.1. 安装Node.js和npm
 
 ```javascript
 // 使用淘宝 NPM 镜像
@@ -1297,7 +1711,7 @@ console.log('Server running at http://127.0.0.1:8888/');
 
 [运行和调试JavaScript](https://www.bilibili.com/video/av5827351/)
 
-#### 3.3.2. 模块
+#### 3.4.2. 模块
 
 在Node环境中，一个.js文件就称之为一个模块（module）。
 
@@ -1346,7 +1760,7 @@ module.exports = {
     greet: greet
 };
 ```
-#### 3.3.3. NPM 使用介绍
+#### 3.4.3. NPM 使用介绍
 
 npm 安装 Node.js 模块语法格式如下：
 
@@ -1372,7 +1786,7 @@ var express = require('express');
 ```
 package.json 位于模块的目录位于 `node_modules/express/package.json` 下，用于定义包的属性。
 
-#### 3.3.4. Node.js 事件循环
+#### 3.4.4. Node.js 事件循环
 
 事件就是需要 eventEmitter.on 去绑定一个事件通过eventEmitter.emit 去触发这个事件其次说的是 事件的 接收 和 发生 是分开的 就像 一个外卖店你可以不停的接受很多订单, 接受以后开始告诉厨师去做外卖, 做好的外卖对应的外送给每个用户，如果单线程的话那只能是接收一个订单, 做好以后在接收下一个外卖订单，明显效率非常低。
 
@@ -1406,7 +1820,7 @@ eventEmitter.emit('connection');
 console.log("程序执行完毕。");
 ```
 
-#### 3.3.5. 基本模块
+#### 3.4.5. 基本模块
 
 Node.js是运行在服务区端的JavaScript环境，服务器程序和浏览器程序相比，最大的特点是没有浏览器的安全限制了，而且，服务器程序必须能接收网络请求，读写文件，处理二进制内容，所以，Node.js内置的常用模块就是为了实现基本的服务器功能。
 
@@ -1441,7 +1855,7 @@ if (typeof(window) === 'undefined') {
 }
 ```
 
-##### 3.3.5.1. fs
+##### 3.4.5.1. fs
 
 异步读文件
 
@@ -1552,7 +1966,7 @@ fs.stat('sample.txt', function (err, stat) {
     }
 });
 ```
-##### 3.3.5.2. stream
+##### 3.4.5.2. stream
 
 从文件流读取文本内容
 
@@ -1608,7 +2022,7 @@ var ws = fs.createWriteStream('copied.txt');
 
 rs.pipe(ws);
 ```
-##### 3.3.5.3. http
+##### 3.4.5.3. http
 
     了解HTTP协议，HTTP格式
     理解HTTP请求流程
@@ -1663,7 +2077,7 @@ Url {
   href: 'http://user:pass@host.com:8080/path/to/file?query=string#hash' }
 ```
 
-##### 3.3.5.4. crypto
+##### 3.4.5.4. crypto
 
     理解摘要算法，又称哈希算法、散列算法。
 
@@ -1769,7 +2183,7 @@ console.log('Secret of Xiao Ming: ' + ming_secret.toString('hex'));
 console.log('Secret of Xiao Hong: ' + hong_secret.toString('hex'));
 ```
 
-### 3.4. Web开发
+### 3.5. Web开发
 
 Web应用开发阶段：
 1. 静态Web页面
@@ -1779,7 +2193,7 @@ Web应用开发阶段：
 5. MVVM：Model-View-ViewModel。MVVM的设计思想：关注Model的变化，让MVVM框架去自动更新DOM的状态，从而把开发者从操作DOM的繁琐步骤中解脱出来！
 6. Node.js
 
-#### 3.4.1. koa
+#### 3.5.1. koa
 
 ```javascript
 // 导入koa，和koa 1.x不同，在koa2中，我们导入的是一个class，因此用大写的Koa表示:
@@ -1909,7 +2323,7 @@ MVC：Model-View-Controller
 
     重点掌握MVC编程
 
-#### 3.4.2. MySQL
+#### 3.5.2. MySQL
 
 
 
@@ -1966,13 +2380,13 @@ Pet.findAll()
 
     注意findAll()方法可以接收where、order这些参数，这和将要生成的SQL语句是对应的。
 
-#### 3.4.3. mocha
+#### 3.5.3. mocha
 
-#### 3.4.4. WebSocket
+#### 3.5.4. WebSocket
 
-#### 3.4.5. REST
+#### 3.5.5. REST
 
-#### 3.4.6. MVVM
+#### 3.5.6. MVVM
 
     MVVM是Model-View-ViewModel的缩写。
 
